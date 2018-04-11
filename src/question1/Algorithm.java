@@ -1,9 +1,15 @@
 package question1;
 
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 public class Algorithm {
 	
@@ -23,12 +29,17 @@ public class Algorithm {
 		String[] alphabets = {"A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"};
 		
 		HashMap<String, Integer> frequencyTable = new HashMap<String, Integer>();
-		HashMap<String, Integer> frequencyTableDigraphs =  new HashMap<String, Integer>();
+		String key = "ETASRIONHPLDCMGUBFVWYXK---";
 	
 		for(int i=0; i<alphabets.length; i++) {
 			frequencyTable.put(alphabets[i], 0);
 		}
 		
+		StringBuilder text = new StringBuilder(cipher.length());
+		
+		for(int i=0; i<cipher.length(); i++) {
+			text.append("-");
+		}
 		
 		for (char c : cipher.toCharArray()) {
 			if(frequencyTable.containsKey(String.valueOf(c))) {
@@ -38,46 +49,68 @@ public class Algorithm {
 		}
 				
 		System.out.println(frequencyTable);
-		String newCipher = cipher;
 		
-		String maxKey = maxValue(frequencyTable).getKey();
-		newCipher = replaceKey(cipher, maxKey, "E", newCipher);
+		HashMap<String, Integer> SortedfrequencyTable = (HashMap<String, Integer>) sortByComparator(frequencyTable, false);
+		System.out.println(SortedfrequencyTable);
+		
 		
 		System.out.println(cipher);
-		System.out.println(newCipher);
 		
+		Object[] keySets = SortedfrequencyTable.keySet().toArray();
 		
-		
-		
-
-		
-		
-	}
-	
-	private Entry<String, Integer> maxValue(HashMap<String, Integer> map) {
-		Map.Entry<String, Integer> maxEntry = null;
-		
-		for(Map.Entry<String, Integer> entry : map.entrySet()) {
-			if(maxEntry == null || entry.getValue().compareTo(maxEntry.getValue()) > 0) {
-				maxEntry = entry;
-			}
+		for(int i=0; i<key.length(); i++) {
+			decrypt(text, keySets[i].toString(), key.charAt(i), cipher, key);
+			System.out.println(text);
 		}
 		
-		System.out.println(maxEntry);
-		return maxEntry;
-		
+		System.out.println();
+		System.out.println(text);
 	}
-	
-	private String replaceKey(String cipher, String key, String replaceL, String newCipher) {
+		
+	private void decrypt(StringBuilder sb, String key, char replaceKey, String cipher, String keyCheck) {
 		for(int i=0; i<cipher.length(); i++) {
 			if(cipher.charAt(i) == key.charAt(0)) {
-				newCipher = cipher.replace(cipher.charAt(i), replaceL.charAt(0));
-			}else {
-				newCipher = cipher.replace(cipher.charAt(i), "-".charAt(0));
+				sb.setCharAt(i, replaceKey);
+			} else {
+				if(sb.toString().contains(keyCheck)) 
+					sb.setCharAt(i, "-".charAt(0));
 			}
 		}
-		
-		return newCipher;
 	}
+	
+	private static Map<String, Integer> sortByComparator(Map<String, Integer> unsortMap, final boolean order)
+    {
+
+        List<Entry<String, Integer>> list = new LinkedList<Entry<String, Integer>>(unsortMap.entrySet());
+
+        // Sorting the list based on values
+        Collections.sort(list, new Comparator<Entry<String, Integer>>()
+        {
+            public int compare(Entry<String, Integer> o1,
+                    Entry<String, Integer> o2)
+            {
+                if (order)
+                {
+                    return o1.getValue().compareTo(o2.getValue());
+                }
+                else
+                {
+                    return o2.getValue().compareTo(o1.getValue());
+
+                }
+            }
+        });
+
+        // Maintaining insertion order with the help of LinkedList
+        Map<String, Integer> sortedMap = new LinkedHashMap<String, Integer>();
+        for (Entry<String, Integer> entry : list)
+        {
+            sortedMap.put(entry.getKey(), entry.getValue());
+        }
+
+        return sortedMap;
+    }
+
+	
 
 }
